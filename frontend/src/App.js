@@ -11,44 +11,59 @@ import { useEffect, useState } from 'react';
 // new way theres library called request
 
 function App() {
-    const [events, setEvents] = useState([]);  
-    useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8000/events")
-      const eventData = await response.json()
-      console.log(eventData)
+  const [file, setFile] = useState(null);
+  const [ocrResult, setOcrResult] = useState('');
 
-      setEvents(eventData)
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('ocrImageFile', file);
+
+      try {
+        const response = await fetch('http://localhost:8000/ocr', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setOcrResult(data.ocrResult);
+        } else {
+          console.error('Error uploading image.');
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    } else {
+      console.error('No file selected.');
     }
-    fetchData()
-  })
-
-  const eventLis = events.map((event) => {
-      return <li>{event.name}</li>
-  })
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          HELLO <code>src/App.js</code> and save to reload.
-        </p>
-        <ul>
-          {eventLis}
-        </ul>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      {/* <Image /> */}
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Choose an image:
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+
+      {ocrResult && (
+        <div>
+          <h2>OCR Result:</h2>
+          <p>{ocrResult}</p>
+        </div>
+      )}
     </div>
-  );
-}
+  )
+};
+
 
 export default App;

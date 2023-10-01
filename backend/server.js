@@ -1,9 +1,15 @@
 require('dotenv').config()
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser')
 const cors = require('cors');
+
 app.use(cors());
+app.use(bodyParser.json());
 const MongoClient = require("mongodb").MongoClient;
+
+const mainRoutes = require("./routes.js");
+app.use("/", mainRoutes);
 
 const connect = async () => {
     const client = new MongoClient(process.env.AZURE_DB_STRING);
