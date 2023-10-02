@@ -34,6 +34,7 @@ module.exports = {
             body: buffer,
         });
         const ocrText = await response.json(); // parses JSON response into native JavaScript objects
+        console.log("OCRTEXT", ocrText)
         console.log(ocrText.readResult.content)
         res.json({ ocrResult: ocrText.readResult.content })
     },
@@ -107,6 +108,7 @@ module.exports = {
             vi: "vi-VN-HoaiMyNeural",
             en: "en-US-JennyNeural",
             es: "es-ES-TeoNeural",
+            zh:	"zh-CN-XiaoxiaoNeural",
         }
         speechConfig.speechSynthesisVoiceName = langToVoiceName[req.body.lang]
 

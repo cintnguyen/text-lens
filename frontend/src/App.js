@@ -12,36 +12,115 @@ import { useEffect, useState } from 'react';
 
 function App() {
   const [file, setFile] = useState(null);
-  const [ocrResult, setOcrResult] = useState('');
+  const [summary, setSummary] = useState('');
+  const [translation, setTranslation] = useState('');
+  const [translationLang, setTranslationLang] = useState('')
+  const [audioFile, setAudioFile] = useState(null)
+  console.log("TRNASLATIONALNG", translationLang)
+
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
 
+  const fetchSummary = async () => {
+    const formData = new FormData();
+    formData.append('ocrImageFile', file);
+
+    try {
+      const ocrResponse = await fetch('http://localhost:8000/ocr', {
+        method: 'POST',
+        body: formData,
+      });
+
+      let ocrData = null
+      if (ocrResponse.ok) {
+        ocrData = await ocrResponse.json();
+      } else {
+        console.error('Error uploading image.');
+        return null;
+      }
+
+      const summaryResponse = await fetch('http://localhost:8000/aisummary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ textToSummarize: ocrData.ocrResult }),
+      });
+
+      if (summaryResponse.ok) {
+        const summaryData = await summaryResponse.json();
+        setSummary(summaryData.summary);
+        return summaryData.summary
+      } else {
+        console.error('Error getting summary.');
+        return null
+      }
+
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  }
+
+  const fetchTranslation = async (text) => {
+    const translationResponse = await fetch('http://localhost:8000/translation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ textToTranslate: text, fromLang: "en", toLang: translationLang })
+    });
+
+    if (translationResponse.ok) {
+      const translationData = await translationResponse.json();
+      console.log("TRANSLATION", translationData.translation[0].translations[0].text)
+      setTranslation(translationData.translation[0].translations[0].text);
+    } else {
+      console.error('Error getting translation.');
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setAudioFile(null)
 
-    if (file) {
-      const formData = new FormData();
-      formData.append('ocrImageFile', file);
-
-      try {
-        const response = await fetch('http://localhost:8000/ocr', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setOcrResult(data.ocrResult);
-        } else {
-          console.error('Error uploading image.');
-        }
-      } catch (error) {
-        console.error('Error uploading image:', error);
+    if (file && translationLang) {
+      const summary = await fetchSummary();
+      if (summary) {
+        fetchTranslation(summary);
       }
     } else {
       console.error('No file selected.');
+    }
+  }
+
+  const readSummary = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/speech", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lang: translationLang, textToSpeak: translation }),
+      });
+      const arrayBuffer = await response.arrayBuffer();
+      console.log("ARRAYBUFFER", arrayBuffer)
+
+      // Create an AudioContext
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Decode the audio data from the array buffer
+      const decodedData = await audioContext.decodeAudioData(arrayBuffer);
+      console.log("DECODEDDATA", decodedData)
+
+      const dataUrl = URL.createObjectURL(new Blob([decodedData]))
+      // const dataUrl = "'data:audio/wav;base64," + btoa(decodedData)+"'"
+      setAudioFile(dataUrl)
+      console.log("DATAURL",dataUrl.length)
+    } catch (error) {
+      console.error('Error fetching and playing WAV file:', error);
     }
   };
 
@@ -52,14 +131,42 @@ function App() {
           Choose an image:
           <input type="file" accept="image/*" onChange={handleFileChange} />
         </label>
+        <select
+          onChange={(e) => setTranslationLang(e.target.value)}
+          value={translationLang}
+        >
+          <option value="" disabled="disabled">Select a translation language:</option>
+          <option value="vi">Vietnamese</option>
+          <option value="es">Spanish</option>
+          <option value="zh">Chinese</option>
+          <option value="en">English</option>
+        </select>
         <button type="submit">Submit</button>
       </form>
 
-      {ocrResult && (
+      {summary && (
         <div>
-          <h2>OCR Result:</h2>
-          <p>{ocrResult}</p>
+          <div>
+            <h2>Summary Result:</h2>
+            <p>{summary}</p>
+          </div>
         </div>
+
+      )}
+
+      {translation && (
+        <div>
+          <h2>Translation:</h2>
+          <p>{translation}</p>
+
+          <div>
+            <button onClick={readSummary}>Read Summary</button>
+          </div>
+        </div>
+      )}
+
+      {audioFile && (
+        <audio controls src={audioFile} />
       )}
     </div>
   )
