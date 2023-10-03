@@ -1,8 +1,8 @@
 # TextLens
 
-Growing up as a child of immigrant parents, I had wish technology like this had existed so 6 year old me didn't need to translate important financial and health related documents. This is to help other families out there like mine! With a snap of a photo, the user will see a translation summary of what the document is about in their language of choice and have it read it out to them!
-
 A full-stack app designed to assist immigrants in translating documents using Azure's APIs, ensuring accurate and efficient language translation and speech. (Optical character recognition , text to speech, language, openAI APIs)
+
+Growing up as a child of immigrant parents, I had wish technology like this had existed so 6 year old me didn't need to translate important financial and health related documents. This is to help other families out there like mine! With a snap of a photo, the user will see a translation summary of what the document is about in their language of choice and have it read it out to them!
 
 ## Tech Used:
 
