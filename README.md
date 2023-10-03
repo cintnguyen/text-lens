@@ -16,7 +16,8 @@ Growing up as a child of immigrant parents, I had wish technology like this had 
 - Learning and using React for this project! Definitely not what I am use to but I am loving it!
 
 ### Next steps:
-- Creating a sleek design
+- Styling coming soon
+- Hosting this project 
 
 ## On your own machine: 
 
