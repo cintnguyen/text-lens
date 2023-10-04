@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from 'react';
-// import Image from './image.jsx';
+import ReactAudioPlayer from 'react-audio-player';
 
 //properties from the react object
 
@@ -105,20 +105,13 @@ function App() {
         },
         body: JSON.stringify({ lang: translationLang, textToSpeak: translation }),
       });
-      const arrayBuffer = await response.arrayBuffer();
-      console.log("ARRAYBUFFER", arrayBuffer)
-
-      // Create an AudioContext
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-      // Decode the audio data from the array buffer
-      const decodedData = await audioContext.decodeAudioData(arrayBuffer);
-      console.log("DECODEDDATA", decodedData)
-
-      const dataUrl = URL.createObjectURL(new Blob([decodedData]))
-      // const dataUrl = "'data:audio/wav;base64," + btoa(decodedData)+"'"
+      const blob = await response.blob()
+      console.log("BLOB", blob)
+      const dataUrl = URL.createObjectURL(blob)
       setAudioFile(dataUrl)
-      console.log("DATAURL",dataUrl.length)
+
+      
+      console.log("DATAURL",dataUrl)
     } catch (error) {
       console.error('Error fetching and playing WAV file:', error);
     }
@@ -166,7 +159,11 @@ function App() {
       )}
 
       {audioFile && (
-        <audio controls src={audioFile} />
+       <ReactAudioPlayer
+       src={audioFile}
+       autoPlay
+       controls
+     />
       )}
     </div>
   )
