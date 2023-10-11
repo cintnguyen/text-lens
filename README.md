@@ -25,10 +25,9 @@ Growing up as a child of immigrant parents, I had wish technology like this had 
 
 `cd frontend`\
 `npm install`\
-
 `cd ..`\
 `cd backend`\
-`npm install`\
+`npm install`
 
 ---
 
@@ -36,7 +35,6 @@ Growing up as a child of immigrant parents, I had wish technology like this had 
 
 `cd frontend`\
 `npm start`\
-
 `cd ..`\
 `cd backend`\
-`npm start`\
+`npm start`
