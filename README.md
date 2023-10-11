@@ -23,10 +23,20 @@ Growing up as a child of immigrant parents, I had wish technology like this had 
 
 ### Install
 
+`cd frontend`
+`npm install`
+
+`cd ..`
+`cd backend`
 `npm install`
 
 ---
 
 ### Run
 
+`cd frontend`
+`npm start`
+
+`cd ..`
+`cd backend`
 `npm start`
