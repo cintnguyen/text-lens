@@ -38,3 +38,5 @@ Growing up as a child of immigrant parents, I had wish technology like this had 
 `cd ..`\
 `cd backend`\
 `npm start`
+
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
